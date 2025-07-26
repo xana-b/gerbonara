@@ -1373,17 +1373,17 @@ class LayerStack:
                 if (side, use) in other:
                     self._merge_layer((side, use), other[side, use], mode)
 
-        our_inner, their_inner = self.copper_layers[1:-1], other.copper_layers[1:-1]
+        our_inner, their_inner = [layer for _, layer in self.copper_layers[1:-1]], [layer for _, layer in other.copper_layers[1:-1]]
 
         if bool(our_inner) != bool(their_inner):
             warnings.warn('Merging board without inner layers into board with inner layers, inner layers will be empty on first board.')
 
-        elif our_inner and their_inner:
+        elif our_inner and their_inner and len(our_inner) != len(their_inner):
             warnings.warn('Merging boards with different inner layer counts. Will fill inner layers starting at core.')
 
         diff = len(our_inner) - len(their_inner)
         their_inner = ([None] * max(0, diff//2)) + their_inner + ([None] * max(0, diff//2))
-        our_inner = ([None] * max(0, -diff//2)) + their_inner + ([None] * max(0, -diff//2))
+        our_inner = ([None] * max(0, -diff//2)) + our_inner + ([None] * max(0, -diff//2))
 
         new_inner = []
         for ours, theirs in zip(our_inner, their_inner):
